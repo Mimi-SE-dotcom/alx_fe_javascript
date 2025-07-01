@@ -28,12 +28,12 @@ function showRandomQuote() {
     : quotes.filter(q => q.category === selectedCategory);
 
   if (filteredQuotes.length === 0) {
-    quoteDisplay.textContent = 'No quotes available in this category.';
+    quoteDisplay.innerHTML = '<em>No quotes available in this category.</em>';
     return;
   }
 
   const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-  quoteDisplay.textContent = `"${filteredQuotes[randomIndex].text}" — ${filteredQuotes[randomIndex].category}`;
+  quoteDisplay.innerHTML = `"${filteredQuotes[randomIndex].text}" — ${filteredQuotes[randomIndex].category}`;
 }
 
 // Add new quote and update DOM
