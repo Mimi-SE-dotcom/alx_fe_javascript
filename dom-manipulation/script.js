@@ -94,9 +94,79 @@ function createAddQuoteForm() {
   document.body.appendChild(formContainer);
 }
 
+
+
+
+// ✅ Export quotes to JSON
+function exportToJsonFile() {
+  const dataStr = JSON.stringify(quotes, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "quotes.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+// ✅ Import quotes from JSON file
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function (e) {
+    try {
+      const importedQuotes = JSON.parse(e.target.result);
+      if (Array.isArray(importedQuotes)) {
+        quotes.push(...importedQuotes);
+        saveQuotes();
+        populateCategories();
+        alert("Quotes imported successfully!");
+      } else {
+        alert("Invalid JSON format.");
+      }
+    } catch (error) {
+      alert("Failed to import JSON file.");
+    }
+  };
+  fileReader.readAsText(event.target.files[0]);
+}
+
+// ✅ Create import/export controls
+function createJsonControls() {
+  const controls = document.createElement("div");
+
+  // Export button
+  const exportBtn = document.createElement("button");
+  exportBtn.textContent = "Export Quotes (JSON)";
+  exportBtn.addEventListener("click", exportToJsonFile);
+
+  // Import input
+  const importInput = document.createElement("input");
+  importInput.type = "file";
+  importInput.accept = ".json";
+  importInput.addEventListener("change", importFromJsonFile);
+
+  controls.appendChild(exportBtn);
+  controls.appendChild(importInput);
+  document.body.appendChild(controls);
+}
+
+// Load previous session quote (optional UI)
+function loadLastViewedQuote() {
+  const last = sessionStorage.getItem("lastQuote");
+  if (last) {
+    const { text, category } = JSON.parse(last);
+    quoteDisplay.innerHTML = `"${text}" — ${category}`;
+  }
+}
+
 // Event Listeners
 newQuoteBtn.addEventListener('click', showRandomQuote);
 
 // Initial Setup
+loadQuotes();
 populateCategories();
 createAddQuoteForm();
+createJsonControls();
+loadLastViewedQuote();

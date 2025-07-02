@@ -30,6 +30,13 @@
     <button onclick="addQuote()">Add Quote</button>
   </div>
 
+
+   <div class="json-controls">
+    <h3>Manage Quotes (JSON)</h3>
+    <button onclick="exportToJsonFile()">Export Quotes (JSON)</button>
+    <input type="file" accept=".json" onchange="importFromJsonFile(event)" />
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
