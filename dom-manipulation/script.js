@@ -25,14 +25,22 @@ function loadQuotes() {
 
 // Populate initial categories in the dropdown
 function populateCategories() {
+  const selected = localStorage.getItem('lastSelectedCategory') || 'all';
+  
+  categoryFilter.innerHTML = '<option value="all">All</option>';
+
   const categories = [...new Set(quotes.map(q => q.category))];
+
   categories.forEach(category => {
     const option = document.createElement('option');
     option.value = category;
     option.textContent = category;
     categoryFilter.appendChild(option);
   });
+
+  categoryFilter.value = selected;
 }
+
 
 // Show a random quote, filtered by category
 function showRandomQuote() {
@@ -66,6 +74,14 @@ function addQuote() {
   const newQuote = { text, category };
   quotes.push(newQuote);
   saveQuotes();
+
+  populateCategories();  // Re-populate category dropdown
+  filterQuotes();        // Show updated list based on filter
+
+  textInput.value = '';
+  categoryInput.value = '';
+  alert("Quote added successfully!");
+}
 
   // Add new category to dropdown if it doesn't exist
   if (![...categoryFilter.options].some(option => option.value === category)) {
@@ -176,14 +192,39 @@ function loadLastViewedQuote() {
   }
 }
 
+//add new function
+function filterQuotes() {
+  const selectedCategory = categoryFilter.value;
+
+  // Save selected category in local storage
+  localStorage.setItem('lastSelectedCategory', selectedCategory);
+
+  // Filter quotes
+  const filteredQuotes = selectedCategory === 'all'
+    ? quotes
+    : quotes.filter(q => q.category === selectedCategory);
+
+  if (filteredQuotes.length === 0) {
+    quoteDisplay.innerHTML = '<em>No quotes available in this category.</em>';
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const selectedQuote = filteredQuotes[randomIndex];
+  quoteDisplay.innerHTML = `"${selectedQuote.text}" — ${selectedQuote.category}`;
+}
+
+
 
 
 // Event Listeners
 newQuoteBtn.addEventListener('click', showRandomQuote);
+categoryFilter.addEventListener("change", filterQuotes);
 
 // Initial Setup
-loadQuotes();
-populateCategories();
-createAddQuoteForm();
-createJsonControls();
-loadLastViewedQuote();
+loadQuotes();             // Load saved quotes
+populateCategories();     // Populate category dropdown
+createAddQuoteForm();     // Add quote form
+createJsonControls();     // Add import/export
+loadLastViewedQuote();    // Optional: show last quote
+filterQuotes();           // Show filtered quote on load
