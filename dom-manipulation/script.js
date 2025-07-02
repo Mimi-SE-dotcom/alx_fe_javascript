@@ -9,6 +9,20 @@ const quoteDisplay = document.getElementById('quoteDisplay');
 const categoryFilter = document.getElementById('categoryFilter');
 const newQuoteBtn = document.getElementById('newQuote');
 
+
+// ✅ Save quotes to localStorage
+function saveQuotes() {
+  localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+// ✅ Load quotes from localStorage
+function loadQuotes() {
+  const storedQuotes = localStorage.getItem('quotes');
+  if (storedQuotes) {
+    quotes = JSON.parse(storedQuotes);
+  }
+}
+
 // Populate initial categories in the dropdown
 function populateCategories() {
   const categories = [...new Set(quotes.map(q => q.category))];
@@ -51,6 +65,7 @@ function addQuote() {
 
   const newQuote = { text, category };
   quotes.push(newQuote);
+  saveQuotes();
 
   // Add new category to dropdown if it doesn't exist
   if (![...categoryFilter.options].some(option => option.value === category)) {
@@ -160,6 +175,8 @@ function loadLastViewedQuote() {
     quoteDisplay.innerHTML = `"${text}" — ${category}`;
   }
 }
+
+
 
 // Event Listeners
 newQuoteBtn.addEventListener('click', showRandomQuote);
