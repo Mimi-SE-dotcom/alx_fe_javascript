@@ -229,7 +229,7 @@ async function fetchQuotesFromServer() {
 }
 
 // ✅ Sync with "server" and resolve conflicts
-async function syncQuote() {
+async function syncQuotes() {
   const serverQuotes = await fetchQuotesFromServer();
   let updated = false;
 
@@ -270,7 +270,7 @@ function showNotification(message) {
 function createSyncButton() {
   const btn = document.createElement("button");
   btn.textContent = "Sync Quotes Now";
-  btn.onclick = syncQuote;
+  btn.onclick = syncQuotes;
   document.body.appendChild(btn);
 }
 
@@ -291,5 +291,5 @@ loadLastViewedQuote();    // Optional: show last quote
 filterQuotes();           // Show filtered quote on load
 createSyncButton();
 syncWithServer();
-setInterval(syncQuote, 30000); // Every 30 seconds
+setInterval(syncQuotes, 30000); // Every 30 seconds
 
