@@ -229,7 +229,7 @@ async function fetchQuotesFromServer() {
 }
 
 // ✅ Sync with "server" and resolve conflicts
-async function syncQuotes() {
+async function  syncQuotes() {
   const serverQuotes = await fetchQuotesFromServer();
   let updated = false;
 
@@ -247,7 +247,7 @@ async function syncQuotes() {
   if (updated) {
     saveQuotes();
     populateCategories();
-    showNotification("Quotes synced from mock server.");
+    showNotification("Quotes synced with server!");
   }
 }
 
@@ -290,6 +290,5 @@ createJsonControls();     // Add import/export
 loadLastViewedQuote();    // Optional: show last quote
 filterQuotes();           // Show filtered quote on load
 createSyncButton();
-syncWithServer();
 setInterval(syncQuotes, 30000); // Every 30 seconds
 
