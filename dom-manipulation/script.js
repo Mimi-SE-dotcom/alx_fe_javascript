@@ -214,7 +214,66 @@ function filterQuotes() {
   quoteDisplay.innerHTML = `"${selectedQuote.text}" — ${selectedQuote.category}`;
 }
 
+async function fetchQuotesFromServer() {
+  // Simulate a server response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const serverQuotes = [
+        { text: "Success is not in what you have, but who you are.", category: "Motivation" },
+        { text: "Happiness depends upon ourselves.", category: "Happiness" },
+      ];
+      resolve(serverQuotes);
+    }, 1000); // Simulate 1s server delay
+  });
+}
 
+async function postQuotesToServer(quotes) {
+  console.log("Syncing quotes to server:", quotes);
+  // Simulate a server sync with delay
+  return new Promise(resolve => setTimeout(resolve, 1000));
+}
+
+async function syncWithServer() {
+  const serverQuotes = await fetchQuotesFromServer();
+  
+  let updated = false;
+
+  serverQuotes.forEach(serverQuote => {
+    const exists = quotes.some(local => 
+      local.text === serverQuote.text && local.category === serverQuote.category
+    );
+
+    if (!exists) {
+      quotes.push(serverQuote);
+      updated = true;
+    }
+  });
+
+  if (updated) {
+    saveQuotes();
+    populateCategories();
+    showNotification("Quotes synced from server.");
+  }
+}
+
+
+setInterval(syncWithServer, 30000); // Sync every 30 seconds
+
+function showNotification(message) {
+  const note = document.getElementById("notification");
+  note.textContent = message;
+  note.style.display = "block";
+
+  setTimeout(() => {
+    note.style.display = "none";
+  }, 4000);
+}
+
+
+
+
+syncWithServer();              // Sync on first load
+setInterval(syncWithServer, 30000); // Then every 30 secs
 
 
 // Event Listeners
