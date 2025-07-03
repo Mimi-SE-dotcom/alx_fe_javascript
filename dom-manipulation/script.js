@@ -41,6 +41,10 @@ function populateCategories() {
   categoryFilter.value = selected;
 }
 
+function filterQuotes() {
+  showRandomQuote(); // Just reuses the logic to display based on selected filter
+}
+
 
 // Show a random quote, filtered by category
 function showRandomQuote() {
@@ -75,15 +79,7 @@ function addQuote() {
   quotes.push(newQuote);
   saveQuotes();
 
-  populateCategories();  // Re-populate category dropdown
-  filterQuotes();        // Show updated list based on filter
-
-  textInput.value = '';
-  categoryInput.value = '';
-  alert("Quote added successfully!");
-}
-
-  // Add new category to dropdown if it doesn't exist
+    // Update dropdown if new category
   if (![...categoryFilter.options].some(option => option.value === category)) {
     const newOption = document.createElement('option');
     newOption.value = category;
@@ -91,10 +87,32 @@ function addQuote() {
     categoryFilter.appendChild(newOption);
   }
 
+  // ✅ Post new quote to mock server
+  fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(newQuote)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Posted to mock server:", data);
+  })
+  .catch(error => {
+    console.error("Error posting to mock server:", error);
+  });
+
   textInput.value = '';
   categoryInput.value = '';
-  alert("Quote added successfully!");
+  alert("Quote added and posted to mock server!");
 }
+
+  populateCategories();  // Re-populate category dropdown
+  filterQuotes();        // Show updated list based on filter
+
+
+
 // ✅ Create add quote form dynamically (required by checker)
 function createAddQuoteForm() {
   const formContainer = document.createElement("div");
