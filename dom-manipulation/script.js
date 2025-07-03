@@ -192,54 +192,31 @@ function loadLastViewedQuote() {
   }
 }
 
-//add new function
-function filterQuotes() {
-  const selectedCategory = categoryFilter.value;
 
-  // Save selected category in local storage
-  localStorage.setItem('lastSelectedCategory', selectedCategory);
-
-  // Filter quotes
-  const filteredQuotes = selectedCategory === 'all'
-    ? quotes
-    : quotes.filter(q => q.category === selectedCategory);
-
-  if (filteredQuotes.length === 0) {
-    quoteDisplay.innerHTML = '<em>No quotes available in this category.</em>';
-    return;
-  }
-
-  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-  const selectedQuote = filteredQuotes[randomIndex];
-  quoteDisplay.innerHTML = `"${selectedQuote.text}" — ${selectedQuote.category}`;
-}
-
+// ✅ Fetch quotes from mock API
 async function fetchQuotesFromServer() {
-  // Simulate a server response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const serverQuotes = [
-        { text: "Success is not in what you have, but who you are.", category: "Motivation" },
-        { text: "Happiness depends upon ourselves.", category: "Happiness" },
-      ];
-      resolve(serverQuotes);
-    }, 1000); // Simulate 1s server delay
-  });
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const data = await response.json();
+
+    return data.slice(0, 5).map(post => ({
+      text: post.title,
+      category: "Server"
+    }));
+
+  } catch (error) {
+    console.error("Error fetching from server:", error);
+    return [];
+  }
 }
 
-async function postQuotesToServer(quotes) {
-  console.log("Syncing quotes to server:", quotes);
-  // Simulate a server sync with delay
-  return new Promise(resolve => setTimeout(resolve, 1000));
-}
-
+// ✅ Sync with "server" and resolve conflicts
 async function syncWithServer() {
   const serverQuotes = await fetchQuotesFromServer();
-  
   let updated = false;
 
   serverQuotes.forEach(serverQuote => {
-    const exists = quotes.some(local => 
+    const exists = quotes.some(local =>
       local.text === serverQuote.text && local.category === serverQuote.category
     );
 
@@ -252,28 +229,35 @@ async function syncWithServer() {
   if (updated) {
     saveQuotes();
     populateCategories();
-    showNotification("Quotes synced from server.");
+    showNotification("Quotes synced from mock server.");
   }
 }
 
-
-setInterval(syncWithServer, 30000); // Sync every 30 seconds
-
+// ✅ Show a sync notification
 function showNotification(message) {
-  const note = document.getElementById("notification");
-  note.textContent = message;
-  note.style.display = "block";
+  const div = document.createElement("div");
+  div.textContent = message;
+  div.style.background = "#d4edda";
+  div.style.color = "#155724";
+  div.style.padding = "10px";
+  div.style.margin = "10px 0";
+  div.style.border = "1px solid #c3e6cb";
+  div.style.borderRadius = "5px";
+  document.body.insertBefore(div, quoteDisplay);
 
-  setTimeout(() => {
-    note.style.display = "none";
-  }, 4000);
+  setTimeout(() => div.remove(), 4000);
+}
+
+// ✅ Manual Sync Button
+function createSyncButton() {
+  const btn = document.createElement("button");
+  btn.textContent = "Sync Quotes Now";
+  btn.onclick = syncWithServer;
+  document.body.appendChild(btn);
 }
 
 
 
-
-syncWithServer();              // Sync on first load
-setInterval(syncWithServer, 30000); // Then every 30 secs
 
 
 // Event Listeners
@@ -287,3 +271,7 @@ createAddQuoteForm();     // Add quote form
 createJsonControls();     // Add import/export
 loadLastViewedQuote();    // Optional: show last quote
 filterQuotes();           // Show filtered quote on load
+createSyncButton();
+syncWithServer();
+setInterval(syncWithServer, 30000); // Every 30 seconds
+
